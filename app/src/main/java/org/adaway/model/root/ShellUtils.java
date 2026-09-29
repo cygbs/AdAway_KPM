@@ -1,16 +1,11 @@
 package org.adaway.model.root;
 
-import static com.topjohnwu.superuser.ShellUtils.escapedString;
-
 import android.content.Context;
 
 import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
-
-import timber.log.Timber;
 
 /**
  * This class is an utility class to help with shell commands.
@@ -46,54 +41,5 @@ public final class ShellUtils {
 
     public static void killBundledExecutable(String executable) {
         Shell.cmd("killall " + EXECUTABLE_PREFIX + executable + EXECUTABLE_SUFFIX).exec();
-    }
-
-
-
-    /**
-     * Check if a path is writable.
-     *
-     * @param file The file to check.
-     * @return <code>true</code> if the path is writable, <code>false</code> otherwise.
-     */
-    public static boolean isWritable(File file) {
-        // Check first if file can be written without privileges
-        if (file.canWrite()) {
-            return true;
-        }
-        return Shell.cmd("test -w " + escapedString(file.getAbsolutePath()))
-                .exec()
-                .isSuccess();
-    }
-
-    public static boolean remountPartition(File file, MountType type) {
-        Optional<String> partitionOptional = findPartition(file);
-        if (!partitionOptional.isPresent()) {
-            return false;
-        }
-        String partition = partitionOptional.get();
-        Shell.Result result = Shell.cmd("mount -o " + type.getOption() + ",remount " + partition).exec();
-        boolean success = result.isSuccess();
-        if (!success) {
-            Timber.w("Failed to remount partition %s as %s: %s.", partition, type.getOption(), mergeAllLines(result.getErr()));
-        }
-        return success;
-    }
-
-    private static Optional<String> findPartition(File file) {
-        // Get mount points
-        Shell.Result result = Shell.cmd("cat /proc/mounts | cut -d ' ' -f2").exec();
-        List<String> out = result.getOut();
-        // Check file and each parent against mount points
-        while (file != null) {
-            String path = file.getAbsolutePath();
-            for (String mount : out) {
-                if (path.equals(mount)) {
-                    return Optional.of(mount);
-                }
-            }
-            file = file.getParentFile();
-        }
-        return Optional.empty();
     }
 }

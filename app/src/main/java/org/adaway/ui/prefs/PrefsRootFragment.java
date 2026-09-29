@@ -3,12 +3,8 @@ package org.adaway.ui.prefs;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.provider.Settings.ACTION_SECURITY_SETTINGS;
 import static android.widget.Toast.LENGTH_SHORT;
-import static org.adaway.model.root.MountType.READ_ONLY;
-import static org.adaway.model.root.MountType.READ_WRITE;
-import static org.adaway.model.root.ShellUtils.isWritable;
-import static org.adaway.model.root.ShellUtils.remountPartition;
 import static org.adaway.ui.prefs.PrefsActivity.PREFERENCE_NOT_FOUND;
-import static org.adaway.util.Constants.ANDROID_SYSTEM_ETC_HOSTS;
+import static org.adaway.util.Constants.ADBLOCK_HOSTS_TARGET;
 import static org.adaway.util.Constants.PREFS_NAME;
 import static org.adaway.util.WebServerUtils.TEST_URL;
 import static org.adaway.util.WebServerUtils.copyCertificate;
@@ -29,7 +25,6 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
 import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -44,7 +39,6 @@ import org.adaway.ui.dialog.MissingAppDialog;
 import org.adaway.util.AppExecutors;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -62,10 +56,6 @@ public class PrefsRootFragment extends PreferenceFragmentCompat implements Share
      */
     private static final String CERTIFICATE_MIME_TYPE = "application/x-x509-ca-cert";
     /**
-     * The launcher to start open hosts file activity.
-     */
-    private ActivityResultLauncher<Intent> openHostsFileLauncher;
-    /**
      * The launcher to prepare web service certificate activity.
      */
     private ActivityResultLauncher<String> prepareCertificateLauncher;
@@ -76,7 +66,6 @@ public class PrefsRootFragment extends PreferenceFragmentCompat implements Share
         getPreferenceManager().setSharedPreferencesName(PREFS_NAME);
         addPreferencesFromResource(R.xml.preferences_root);
         // Register for activities
-        registerForOpenHostActivity();
         registerForPrepareCertificateActivity();
         // Bind pref actions
         bindOpenHostsFile();
@@ -121,17 +110,6 @@ public class PrefsRootFragment extends PreferenceFragmentCompat implements Share
         }
     }
 
-    private void registerForOpenHostActivity() {
-        this.openHostsFileLauncher = registerForActivityResult(new StartActivityForResult(), result -> {
-            try {
-                File hostFile = new File(ANDROID_SYSTEM_ETC_HOSTS).getCanonicalFile();
-                remountPartition(hostFile, READ_ONLY);
-            } catch (IOException e) {
-                Timber.e(e, "Failed to get hosts canonical file.");
-            }
-        });
-    }
-
     private void registerForPrepareCertificateActivity() {
         this.prepareCertificateLauncher = registerForActivityResult(
                 new ActivityResultContracts.CreateDocument(CERTIFICATE_MIME_TYPE),
@@ -147,24 +125,16 @@ public class PrefsRootFragment extends PreferenceFragmentCompat implements Share
 
     private boolean openHostsFile(Preference preference) {
         try {
-            File hostFile = new File(ANDROID_SYSTEM_ETC_HOSTS).getCanonicalFile();
-            boolean remount = !isWritable(hostFile) && remountPartition(hostFile, READ_WRITE);
+            File hostFile = new File(ADBLOCK_HOSTS_TARGET);
             Intent intent = new Intent()
                     .setAction(Intent.ACTION_VIEW)
                     .setDataAndType(Uri.parse("file://" + hostFile.getAbsolutePath()), "text/plain");
-            if (remount) {
-                this.openHostsFileLauncher.launch(intent);
-            } else {
-                startActivity(intent);
-            }
+            startActivity(intent);
             return true;
-        } catch (IOException e) {
-            Timber.e(e, "Failed to get hosts canonical file.");
         } catch (ActivityNotFoundException e) {
             MissingAppDialog.showTextEditorMissingDialog(getContext());
             return false;
         }
-        return false;
     }
 
     private void bindRedirection() {

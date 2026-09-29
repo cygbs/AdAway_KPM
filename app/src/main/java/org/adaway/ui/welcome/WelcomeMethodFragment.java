@@ -1,27 +1,17 @@
 package org.adaway.ui.welcome;
 
-import static android.app.Activity.RESULT_OK;
-import static android.provider.Settings.ACTION_VPN_SETTINGS;
+import static java.lang.Boolean.TRUE;
 import static org.adaway.model.adblocking.AdBlockMethod.ROOT;
 import static org.adaway.model.adblocking.AdBlockMethod.UNDEFINED;
-import static org.adaway.model.adblocking.AdBlockMethod.VPN;
-import static java.lang.Boolean.TRUE;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.VpnService;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.topjohnwu.superuser.Shell;
@@ -29,7 +19,6 @@ import com.topjohnwu.superuser.Shell;
 import org.adaway.R;
 import org.adaway.databinding.WelcomeMethodLayoutBinding;
 import org.adaway.helper.PreferenceHelper;
-import org.adaway.util.log.SentryLog;
 
 /**
  * This class is a fragment to setup the ad blocking method.
@@ -37,8 +26,12 @@ import org.adaway.util.log.SentryLog;
  * @author Bruce BUJON (bruce.bujon(at)gmail(dot)com)
  */
 public class WelcomeMethodFragment extends WelcomeFragment {
+    /**
+     * Alpha value applied to the disabled VPN based ad-blocking method.
+     */
+    private static final float DISABLED_ALPHA = 0.5F;
+
     private WelcomeMethodLayoutBinding binding;
-    private ActivityResultLauncher<Intent> prepareVpnLauncher;
     @ColorInt
     private int cardColor;
     @ColorInt
@@ -48,17 +41,13 @@ public class WelcomeMethodFragment extends WelcomeFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.binding = WelcomeMethodLayoutBinding.inflate(inflater, container, false);
-        this.prepareVpnLauncher = registerForActivityResult(new StartActivityForResult(), result -> {
-            if (result.getResultCode() == RESULT_OK) {
-                notifyVpnEnabled();
-            } else {
-                notifyVpnDisabled();
-                checkAlwaysOnVpn();
-            }
-        });
+
+        // The VPN based ad-blocking method is not supported anymore: gray it out and disable it.
+        this.binding.vpnCardView.setAlpha(DISABLED_ALPHA);
+        this.binding.vpnMethodLayout.setAlpha(DISABLED_ALPHA);
+        this.binding.vpnCardView.setOnClickListener(null);
 
         this.binding.rootCardView.setOnClickListener(this::checkRoot);
-        this.binding.vpnCardView.setOnClickListener(this::enableVpnService);
 
         this.cardColor = getResources().getColor(R.color.cardBackground, null);
         this.cardEnabledColor = getResources().getColor(R.color.cardEnabledBackground, null);
@@ -66,7 +55,10 @@ public class WelcomeMethodFragment extends WelcomeFragment {
     }
 
     private void checkRoot(@Nullable View view) {
-        notifyVpnDisabled();
+        // Reset the selected method while checking
+        PreferenceHelper.setAbBlockMethod(requireContext(), UNDEFINED);
+        this.binding.rootCardView.setCardBackgroundColor(this.cardColor);
+        this.binding.vpnCardView.setCardBackgroundColor(this.cardColor);
         Shell.getShell();
         if (TRUE.equals(Shell.isAppGrantedRoot())) {
             notifyRootEnabled();
@@ -75,23 +67,7 @@ public class WelcomeMethodFragment extends WelcomeFragment {
         }
     }
 
-    private void enableVpnService(@Nullable View view) {
-        notifyRootDisabled(false);
-        Context context = getContext();
-        if (context == null) {
-            return;
-        }
-        // Check user authorization
-        Intent prepareIntent = VpnService.prepare(context);
-        if (prepareIntent == null) {
-            notifyVpnEnabled();
-        } else {
-            this.prepareVpnLauncher.launch(prepareIntent);
-        }
-    }
-
     private void notifyRootEnabled() {
-        SentryLog.recordBreadcrumb("Enable root ad-blocking method");
         PreferenceHelper.setAbBlockMethod(requireContext(), ROOT);
         this.binding.rootCardView.setCardBackgroundColor(this.cardEnabledColor);
         this.binding.vpnCardView.setCardBackgroundColor(this.cardColor);
@@ -111,46 +87,5 @@ public class WelcomeMethodFragment extends WelcomeFragment {
                     .create()
                     .show();
         }
-    }
-
-    private void notifyVpnEnabled() {
-        SentryLog.recordBreadcrumb("Enable vpn ad-blocking method");
-        PreferenceHelper.setAbBlockMethod(requireContext(), VPN);
-        this.binding.rootCardView.setCardBackgroundColor(this.cardColor);
-        this.binding.vpnCardView.setCardBackgroundColor(this.cardEnabledColor);
-        allowNext();
-    }
-
-    private void notifyVpnDisabled() {
-        PreferenceHelper.setAbBlockMethod(requireContext(), UNDEFINED);
-        this.binding.rootCardView.setCardBackgroundColor(this.cardColor);
-        this.binding.vpnCardView.setCardBackgroundColor(this.cardColor);
-        blockNext();
-    }
-
-    private void checkAlwaysOnVpn() {
-        @StringRes int alwayson_message = R.string.welcome_vpn_alwayson_description;
-        try {
-            String alwaysOn = Settings.Secure.getString(requireContext().getContentResolver(), "always_on_vpn_app");
-            if (alwaysOn == null) {
-                return;
-            }
-        } catch (SecurityException exception) {
-            // Some Android versions will block the always_on_vpn_app request, as it's not marked @Readable
-            alwayson_message = R.string.welcome_vpn_alwayson_blocked_description;
-        }
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.welcome_vpn_alwayson_title)
-                .setMessage(alwayson_message)
-                .setNegativeButton(R.string.button_close, null)
-                .setPositiveButton(
-                        R.string.welcome_vpn_alwayson_settings_action,
-                        (dialog, which) -> {
-                            dialog.dismiss();
-                            Intent intent = new Intent(ACTION_VPN_SETTINGS);
-                            startActivity(intent);
-                        })
-                .create()
-                .show();
     }
 }

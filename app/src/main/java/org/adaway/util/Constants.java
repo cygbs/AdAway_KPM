@@ -36,4 +36,9 @@ public class Constants {
     public static final String COMMAND_CHMOD_644 = "chmod 644";
 
     public static final String ANDROID_SYSTEM_ETC_HOSTS = "/system/etc/" + HOSTS_FILENAME;
+
+    /**
+     * The hosts file target used by the KPM hosts redirection module.
+     */
+    public static final String ADBLOCK_HOSTS_TARGET = "/data/adb/" + HOSTS_FILENAME;
 }

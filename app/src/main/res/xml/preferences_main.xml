@@ -24,7 +24,7 @@
             app:key="@string/pref_root_ad_block_method_key"
             app:title="@string/pref_root_ad_blocker_configuration" />
         <Preference
-            app:fragment="org.adaway.ui.prefs.PrefsVpnFragment"
+            app:enabled="false"
             app:icon="@drawable/ic_vpn_key_24dp"
             app:key="@string/pref_vpn_ad_block_method_key"
             app:title="@string/pref_vpn_ad_blocker_configuration" />
@@ -42,6 +42,7 @@
     <PreferenceCategory app:title="@string/pref_debug_category">
         <SwitchPreferenceCompat
             app:defaultValue="@bool/pref_enable_telemetry_def"
+            app:enabled="false"
             app:icon="@drawable/outline_cloud_upload_24"
             app:key="@string/pref_enable_telemetry_key"
             app:summary="@string/pref_enable_telemetry_summary"

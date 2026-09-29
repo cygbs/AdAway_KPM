@@ -7,8 +7,7 @@ import static org.adaway.model.error.HostError.COPY_FAIL;
 import static org.adaway.model.error.HostError.NOT_ENOUGH_SPACE;
 import static org.adaway.model.error.HostError.PRIVATE_FILE_FAILED;
 import static org.adaway.model.error.HostError.REVERT_FAIL;
-import static org.adaway.model.root.ShellUtils.isWritable;
-import static org.adaway.util.Constants.ANDROID_SYSTEM_ETC_HOSTS;
+import static org.adaway.util.Constants.ADBLOCK_HOSTS_TARGET;
 import static org.adaway.util.Constants.COMMAND_CHMOD_644;
 import static org.adaway.util.Constants.COMMAND_CHOWN;
 import static org.adaway.util.Constants.DEFAULT_HOSTS_FILENAME;
@@ -17,8 +16,6 @@ import static org.adaway.util.Constants.LINE_SEPARATOR;
 import static org.adaway.util.Constants.LOCALHOST_HOSTNAME;
 import static org.adaway.util.Constants.LOCALHOST_IPV4;
 import static org.adaway.util.Constants.LOCALHOST_IPV6;
-import static org.adaway.model.root.MountType.READ_ONLY;
-import static org.adaway.model.root.MountType.READ_WRITE;
 import static org.adaway.model.root.ShellUtils.mergeAllLines;
 
 import android.content.Context;
@@ -143,7 +140,7 @@ public class RootModel extends AdBlockModel {
     private void checkApplied() {
         boolean applied = false;
 
-        Shell.Result result = Shell.cmd("head -n 1 " + ANDROID_SYSTEM_ETC_HOSTS).exec();
+        Shell.Result result = Shell.cmd("head -n 1 " + ADBLOCK_HOSTS_TARGET).exec();
         if (!result.isSuccess()) {
             Timber.e("Failed to read first line of hosts file. Error code: %s", result.getCode());
         } else {
@@ -267,8 +264,9 @@ public class RootModel extends AdBlockModel {
         String privateDir = this.context.getFilesDir().getAbsolutePath();
         String privateFile = privateDir + File.separator + source;
 
-        // if the target has a trailing slash, it is not a valid target!
-        String target = ANDROID_SYSTEM_ETC_HOSTS;
+        // The KPM module redirects the system hosts file to /data/adb/hosts:
+        // write directly to this always-writable location, no remount is needed.
+        String target = ADBLOCK_HOSTS_TARGET;
         File targetFile = new File(target);
 
         /* check for space on partition */
@@ -278,30 +276,14 @@ public class RootModel extends AdBlockModel {
             throw new HostErrorException(NOT_ENOUGH_SPACE);
         }
 
-        /* Execute commands */
-        boolean writable = isWritable(targetFile);
-        try {
-            if (!writable) {
-                // remount for write access
-                Timber.i("Remounting for RW…");
-                if (!ShellUtils.remountPartition(targetFile, READ_WRITE)) {
-                    throw new CommandException("Failed to remount hosts file partition as read-write.");
-                }
-            }
-            // Copy hosts file then set owner and permissions
-            Shell.Result result = Shell.cmd(
-                    "dd if=" + privateFile + " of=" + target,
-                    COMMAND_CHOWN + " " + target,
-                    COMMAND_CHMOD_644 + " " + target
-            ).exec();
-            if (!result.isSuccess()) {
-                throw new CommandException("Failed to copy hosts file: " + mergeAllLines(result.getErr()));
-            }
-        } finally {
-            if (!writable) {
-                // after all remount target back as read only
-                ShellUtils.remountPartition(targetFile, READ_ONLY);
-            }
+        // Copy hosts file then set owner and permissions
+        Shell.Result result = Shell.cmd(
+                "dd if=" + privateFile + " of=" + target,
+                COMMAND_CHOWN + " " + target,
+                COMMAND_CHMOD_644 + " " + target
+        ).exec();
+        if (!result.isSuccess()) {
+            throw new CommandException("Failed to copy hosts file: " + mergeAllLines(result.getErr()));
         }
     }
 

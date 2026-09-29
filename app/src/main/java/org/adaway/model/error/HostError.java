@@ -17,10 +17,7 @@ public enum HostError {
     PRIVATE_FILE_FAILED(R.string.error_private_file_failed_message, R.string.error_private_file_failed_details),
     NOT_ENOUGH_SPACE(R.string.error_not_enough_space_message, R.string.error_not_enough_space_details),
     COPY_FAIL(R.string.error_copy_failed_message, R.string.error_copy_failed_details),
-    REVERT_FAIL(R.string.error_revert_failed_message, R.string.error_revert_failed_details),
-    // VPN model error
-    ENABLE_VPN_FAIL(R.string.error_enable_vpn_failed_message, R.string.error_enable_vpn_failed_details),
-    DISABLE_VPN_FAIL(R.string.error_disable_vpn_failed_message, R.string.error_disable_vpn_failed_details);
+    REVERT_FAIL(R.string.error_revert_failed_message, R.string.error_revert_failed_details);
 
     @StringRes
     private final int messageKey;

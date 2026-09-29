@@ -19,8 +19,8 @@ import timber.log.Timber;
 /**
  * This class is a {@link android.app.backup.BackupAgent} to backup and restore application state
  * using Android Backup Service. It is based on key-value pairs backup to prevent killing the
- * application during the backup (leaving the VPN foreground service always running). It backs up
- * and restores the application preferences and the user rules.
+ * application during the backup. It backs up and restores the application preferences and the
+ * user rules.
  *
  * @author Bruce BUJON (bruce.bujon(at)gmail(dot)com)
  */

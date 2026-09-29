@@ -17,8 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.adaway.databinding.WelcomeSupportLayoutBinding;
-import org.adaway.helper.PreferenceHelper;
-import org.adaway.util.log.SentryLog;
 
 /**
  * This class is a fragment to inform user how to support the application development.
@@ -46,11 +44,8 @@ public class WelcomeSupportFragment extends WelcomeFragment {
     }
 
     private void customizeSecondOption() {
-        if (SentryLog.isStub()) {
-            showAndBindSponsorship();
-        } else {
-            bindTelemetry();
-        }
+        // Telemetry (Sentry) has been removed: only the sponsorship option remains.
+        showAndBindSponsorship();
     }
 
     private void bindSupport() {
@@ -58,13 +53,6 @@ public class WelcomeSupportFragment extends WelcomeFragment {
         bindLink(context, this.binding.headerImageView, SUPPORT_LINK);
         bindLink(context, this.binding.headerTextView, SUPPORT_LINK);
         bindLink(context, this.binding.paypalCardView, SUPPORT_LINK);
-    }
-
-    private void bindTelemetry() {
-        this.binding.telemetryCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            PreferenceHelper.setTelemetryEnabled(requireContext(), isChecked);
-            SentryLog.setEnabled(requireActivity().getApplication(), isChecked);
-        });
     }
 
     private void showAndBindSponsorship() {

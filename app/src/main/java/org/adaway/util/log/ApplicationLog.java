@@ -34,7 +34,6 @@ public final class ApplicationLog {
             Timber.plant(new Timber.DebugTree());
         } else {
             Shell.enableVerboseLogging = false;
-            SentryLog.init(application);
         }
     }
 
