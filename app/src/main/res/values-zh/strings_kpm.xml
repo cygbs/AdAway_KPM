@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kpm_module_drawer_item">KPM 内核模块</string>
+    <string name="kpm_module_title">KPM 内核模块</string>
+    <string name="kpm_module_description">检查用于重定向 hosts 文件的 KPM 内核模块是否已加载到内核，并显示其状态。</string>
+    <string name="kpm_module_loading">正在检查 KPM 状态…</string>
+    <string name="kpm_module_root_label">Root 权限</string>
+    <string name="kpm_module_available">可用</string>
+    <string name="kpm_module_unavailable">不可用</string>
+    <string name="kpm_module_loaded_label">模块已加载</string>
+    <string name="kpm_module_status_label">模块状态</string>
+    <string name="kpm_module_enabled">已启用</string>
+    <string name="kpm_module_disabled">已禁用</string>
+    <string name="kpm_module_yes">是</string>
+    <string name="kpm_module_no">否</string>
+    <string name="kpm_module_unknown">未知</string>
+    <string name="kpm_module_target_label">实测重定向</string>
+    <string name="kpm_module_info_title">模块信息</string>
+    <string name="kpm_module_name_label">名称</string>
+    <string name="kpm_module_version_label">版本</string>
+    <string name="kpm_module_license_label">许可</string>
+    <string name="kpm_module_author_label">作者</string>
+    <string name="kpm_module_description_label">描述</string>
+    <string name="kpm_module_load_event_label">加载事件</string>
+    <string name="kpm_module_load_source_label">加载来源</string>
+    <string name="kpm_module_raw_title">内核日志证据</string>
+    <string name="kpm_module_no_log">未找到内核日志证据。</string>
+</resources>

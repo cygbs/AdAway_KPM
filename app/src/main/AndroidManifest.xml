@@ -117,6 +117,11 @@
             android:label="@string/selinux_rule_title"
             android:parentActivityName=".ui.home.HomeActivity" />
         <activity
+            android:name=".ui.kpm.KpmModuleActivity"
+            android:exported="false"
+            android:label="@string/kpm_module_title"
+            android:parentActivityName=".ui.home.HomeActivity" />
+        <activity
             android:name=".ui.update.UpdateActivity"
             android:exported="false"
             android:label="@string/update_title"

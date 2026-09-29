@@ -12,6 +12,11 @@
         android:title="@string/selinux_rule_drawer_item"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/drawer_kpm_module"
+        android:icon="@drawable/ic_memory_24dp"
+        android:title="@string/kpm_module_drawer_item"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/drawer_preferences"
         android:icon="@drawable/ic_settings_24dp"
         android:title="@string/preferences_drawer_item"

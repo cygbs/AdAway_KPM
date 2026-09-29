@@ -40,6 +40,7 @@ import org.adaway.model.adblocking.AdBlockMethod;
 import org.adaway.model.error.HostError;
 import org.adaway.ui.help.HelpActivity;
 import org.adaway.ui.hosts.HostsSourcesActivity;
+import org.adaway.ui.kpm.KpmModuleActivity;
 import org.adaway.ui.lists.ListsActivity;
 import org.adaway.ui.log.LogActivity;
 import org.adaway.ui.prefs.PrefsActivity;
@@ -258,6 +259,10 @@ public class HomeActivity extends AppCompatActivity {
             startSelinuxRuleActivity();
             this.drawerBehavior.setState(STATE_HIDDEN);
             return true;
+        } else if (actionId == R.id.drawer_kpm_module) {
+            startKpmModuleActivity();
+            this.drawerBehavior.setState(STATE_HIDDEN);
+            return true;
         }
         return false;
     }
@@ -321,6 +326,13 @@ public class HomeActivity extends AppCompatActivity {
      */
     private void startSelinuxRuleActivity() {
         startActivity(new Intent(this, SelinuxRuleActivity.class));
+    }
+
+    /**
+     * Start the KPM kernel module activity.
+     */
+    private void startKpmModuleActivity() {
+        startActivity(new Intent(this, KpmModuleActivity.class));
     }
 
     /**

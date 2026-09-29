@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kpm_module_drawer_item">KPM kernel module</string>
+    <string name="kpm_module_title">KPM kernel module</string>
+    <string name="kpm_module_description">Checks whether the KernelPatch Module (KPM) that redirects the hosts file is loaded in the kernel and reports its status.</string>
+    <string name="kpm_module_loading">Checking the KPM status…</string>
+    <string name="kpm_module_root_label">Root access</string>
+    <string name="kpm_module_available">available</string>
+    <string name="kpm_module_unavailable">unavailable</string>
+    <string name="kpm_module_loaded_label">KPM loaded</string>
+    <string name="kpm_module_status_label">Module status</string>
+    <string name="kpm_module_enabled">Enabled</string>
+    <string name="kpm_module_disabled">Disabled</string>
+    <string name="kpm_module_yes">yes</string>
+    <string name="kpm_module_no">no</string>
+    <string name="kpm_module_unknown">unknown</string>
+    <string name="kpm_module_target_label">Observed redirect</string>
+    <string name="kpm_module_info_title">Module information</string>
+    <string name="kpm_module_name_label">Name</string>
+    <string name="kpm_module_version_label">Version</string>
+    <string name="kpm_module_license_label">License</string>
+    <string name="kpm_module_author_label">Author</string>
+    <string name="kpm_module_description_label">Description</string>
+    <string name="kpm_module_load_event_label">Load event</string>
+    <string name="kpm_module_load_source_label">Load source</string>
+    <string name="kpm_module_raw_title">Kernel log evidence</string>
+    <string name="kpm_module_no_log">No kernel log evidence found.</string>
+</resources>
