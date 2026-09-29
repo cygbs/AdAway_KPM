@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="selinux_rule_drawer_item">SELinux rules</string>
+    <string name="selinux_rule_title">SELinux rules</string>
+    <string name="selinux_rule_description">AdAway grants the Android resolver (netd) read access to /data/adb so it can use the redirected hosts file, without disabling the SELinux enforcing mode.</string>
+    <string name="selinux_rule_status_checking">Checking the SELinux rules script…</string>
+    <string name="selinux_rule_status_installed">SELinux rules script installed and applied.</string>
+    <string name="selinux_rule_status_failed">Failed to install the SELinux rules script (root required?).</string>
+    <string name="selinux_rule_path_label">Script path</string>
+    <string name="selinux_rule_content_label">Script content</string>
+</resources>

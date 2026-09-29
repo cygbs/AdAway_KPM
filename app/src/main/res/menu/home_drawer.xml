@@ -7,6 +7,11 @@
         android:title="@string/github_project_drawer_item"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/drawer_selinux_rule"
+        android:icon="@drawable/ic_security_24dp"
+        android:title="@string/selinux_rule_drawer_item"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/drawer_preferences"
         android:icon="@drawable/ic_settings_24dp"
         android:title="@string/preferences_drawer_item"

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="selinux_rule_drawer_item">SELinux 规则</string>
+    <string name="selinux_rule_title">SELinux 规则</string>
+    <string name="selinux_rule_description">AdAway 授予系统解析器（netd）对 /data/adb 的读取权限，以便其使用被重定向的 hosts 文件，同时保持 SELinux 为强制模式。</string>
+    <string name="selinux_rule_status_checking">正在检查 SELinux 规则脚本…</string>
+    <string name="selinux_rule_status_installed">SELinux 规则脚本已创建并应用。</string>
+    <string name="selinux_rule_status_failed">SELinux 规则脚本创建失败（可能需要 root？）。</string>
+    <string name="selinux_rule_path_label">脚本路径</string>
+    <string name="selinux_rule_content_label">脚本内容</string>
+</resources>

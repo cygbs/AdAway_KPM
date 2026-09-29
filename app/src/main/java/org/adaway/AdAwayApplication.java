@@ -4,10 +4,12 @@ import android.app.Application;
 
 import org.adaway.helper.NotificationHelper;
 import org.adaway.helper.PreferenceHelper;
+import org.adaway.helper.SelinuxRuleHelper;
 import org.adaway.model.adblocking.AdBlockMethod;
 import org.adaway.model.adblocking.AdBlockModel;
 import org.adaway.model.source.SourceModel;
 import org.adaway.model.update.UpdateModel;
+import org.adaway.util.AppExecutors;
 import org.adaway.util.log.ApplicationLog;
 
 /**
@@ -40,6 +42,8 @@ public class AdAwayApplication extends Application {
         // Create models
         this.sourceModel = new SourceModel(this);
         this.updateModel = new UpdateModel(this);
+        // Ensure the SELinux rules required by the hosts redirection are installed
+        AppExecutors.getInstance().diskIO().execute(SelinuxRuleHelper::ensureInstalled);
     }
 
     /**

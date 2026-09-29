@@ -43,6 +43,7 @@ import org.adaway.ui.hosts.HostsSourcesActivity;
 import org.adaway.ui.lists.ListsActivity;
 import org.adaway.ui.log.LogActivity;
 import org.adaway.ui.prefs.PrefsActivity;
+import org.adaway.ui.selinux.SelinuxRuleActivity;
 import org.adaway.ui.support.SupportActivity;
 import org.adaway.ui.update.UpdateActivity;
 import org.adaway.ui.welcome.WelcomeActivity;
@@ -253,6 +254,10 @@ public class HomeActivity extends AppCompatActivity {
             showProjectPage();
             this.drawerBehavior.setState(STATE_HIDDEN);
             return true;
+        } else if (actionId == R.id.drawer_selinux_rule) {
+            startSelinuxRuleActivity();
+            this.drawerBehavior.setState(STATE_HIDDEN);
+            return true;
         }
         return false;
     }
@@ -309,6 +314,13 @@ public class HomeActivity extends AppCompatActivity {
      */
     private void startPrefsActivity() {
         startActivity(new Intent(this, PrefsActivity.class));
+    }
+
+    /**
+     * Start the SELinux rules activity.
+     */
+    private void startSelinuxRuleActivity() {
+        startActivity(new Intent(this, SelinuxRuleActivity.class));
     }
 
     /**

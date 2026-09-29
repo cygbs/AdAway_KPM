@@ -112,6 +112,11 @@
             android:label="@string/preferences_drawer_item"
             android:parentActivityName=".ui.home.HomeActivity" />
         <activity
+            android:name=".ui.selinux.SelinuxRuleActivity"
+            android:exported="false"
+            android:label="@string/selinux_rule_title"
+            android:parentActivityName=".ui.home.HomeActivity" />
+        <activity
             android:name=".ui.update.UpdateActivity"
             android:exported="false"
             android:label="@string/update_title"
