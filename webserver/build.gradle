@@ -1,6 +1,7 @@
 import com.android.build.gradle.internal.tasks.LibraryJniLibsTask
 
 apply plugin: 'com.android.library'
+def executableName = 'webserver'
 
 android {
     compileSdk 33
@@ -14,6 +15,14 @@ android {
 
     buildFeatures {
         prefab = true
+    }
+
+    sourceSets {
+        main {
+            // The generated directory holds the ndk-build executable renamed as a shared library
+            // so it is packaged in the APK 'lib' folder (see packageExecutable below).
+            jniLibs.srcDir layout.buildDirectory.dir('generated/executableJniLibs').get().asFile
+        }
     }
 
     externalNativeBuild {
@@ -31,37 +40,37 @@ dependencies {
     implementation libs.openssl
 }
 
+def buildFlavor = { gradle.startParameter.taskRequests.toString().containsIgnoreCase("debug") ? "debug" : "release" }
+
 /**
- * Task to rename executables from hello_world to libhello_world_exec.so
- * If they look like libraries, they are packaged in the apk and deployed on the device in the lib folder!
+ * ndk-build produces an executable (e.g. 'webserver'). Android only packages files named
+ * 'lib*.so' shipped in the APK 'lib' folder, so copy the executable into a generated jniLibs
+ * directory renamed as 'lib<name>_exec.so'.
  *
- * Help with files: https://docs.gradle.org/current/userguide/working_with_files.html
+ * Doing the rename into a dedicated, generated jniLibs directory (instead of doing it in place in
+ * the ndk-build output directory) makes the packaging deterministic: the previous in-place
+ * approach relied on Android Gradle Plugin picking up the overwritten file, which failed on clean
+ * builds and packaged the (empty) stub shared library instead of the real executable.
  */
-def renameJniLibAsExecutable = tasks.register('renameJniLibAsExecutable', Copy) {
-    def flavor = gradle.startParameter.taskRequests.toString().containsIgnoreCase("debug") ? "debug" : "release"
+def packageExecutable = tasks.register('packageExecutable', Copy) {
+    def flavor = buildFlavor()
     def buildFolder = layout.buildDirectory.dir("intermediates/ndkBuild/${flavor}/obj/local")
-
-    dependsOn ":${project.name}:externalNativeBuild${flavor.substring(0, 1).toUpperCase()}${flavor.substring(1)}"
-
+    dependsOn ":${project.name}:externalNativeBuild${flavor.capitalize()}"
     from(buildFolder) {
-        exclude "**/objs"
-        exclude "**/objs-debug"
-        exclude "**/*.a"
-        exclude "**/*.d"
-        exclude "**/*.o"
-        exclude "**/*.so"
-        exclude "**/*.txt"
+        include "**/${executableName}"
+        exclude "**/objs/**"
+        exclude "**/objs-debug/**"
     }
-
-    into buildFolder
-
+    into layout.buildDirectory.dir('generated/executableJniLibs')
     rename '(.+)', 'lib$1_exec.so'
-
-    eachFile {
-        println "Replacing ${it.getPath()} from ${flavor} ndkBuild directory"
-    }
+    includeEmptyDirs = false
 }
 
 tasks.withType(LibraryJniLibsTask).configureEach {
-    dependsOn renameJniLibAsExecutable
+    dependsOn packageExecutable
+}
+
+// merge*JniLibFolders also reads the generated jniLibs directory, so it must wait for it too.
+tasks.matching { it.name.toLowerCase().contains('jnilibfolders') }.configureEach {
+    dependsOn packageExecutable
 }
