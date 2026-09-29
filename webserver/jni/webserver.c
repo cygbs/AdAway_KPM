@@ -8,9 +8,11 @@
 
 #define THIS_FILE "WebServer"
 
-// TODO Test difference between 127.0.0.1 + [::1] and localhost
-#define HTTP_URL "http://localhost:80"
-#define HTTPS_URL "https://localhost:443"
+// Use explicit IPv4 loopback addresses and add IPv6 loopback listeners below.
+#define HTTP_URL "http://127.0.0.1:80"
+#define HTTPS_URL "https://127.0.0.1:443"
+#define HTTP_URL_IPV6 "http://[::1]:80"
+#define HTTPS_URL_IPV6 "https://[::1]:443"
 
 #define OOM_ADJ_PATH    "/proc/self/oom_score_adj"
 #define OOM_ADJ_NOKILL  -17
@@ -156,6 +158,15 @@ int main(int argc, char *argv[]) {
     if (https_connection == NULL) {
         __android_log_print(ANDROID_LOG_FATAL, THIS_FILE, "Failed to listen on https port.");
         return EXIT_FAILURE;
+    }
+    // Also listen on the IPv6 loopback: "localhost" resolves to ::1 first on many clients,
+    // so without these listeners IPv6-preferring connections are refused.
+    // IPv6 may be unavailable, so failures are not fatal.
+    if (mg_http_listen(&mgr, HTTP_URL_IPV6, fn, &s) == NULL) {
+        __android_log_print(ANDROID_LOG_INFO, THIS_FILE, "No IPv6 http listener (::1 unavailable?).");
+    }
+    if (mg_http_listen(&mgr, HTTPS_URL_IPV6, fn, &s) == NULL) {
+        __android_log_print(ANDROID_LOG_INFO, THIS_FILE, "No IPv6 https listener (::1 unavailable?).");
     }
 
     setup_signal_handler();

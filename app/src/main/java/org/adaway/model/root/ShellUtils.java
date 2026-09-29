@@ -35,7 +35,11 @@ public final class ShellUtils {
         String nativeLibraryDir = context.getApplicationInfo().nativeLibraryDir;
         String command = "LD_LIBRARY_PATH=" + nativeLibraryDir + " " +
                 nativeLibraryDir + File.separator + EXECUTABLE_PREFIX + executable + EXECUTABLE_SUFFIX + " " +
-                parameters + " &";
+                parameters + " & " +
+                // Detach the daemon from the application freezer cgroup: otherwise Android freezes
+                // it together with the cached application and it stops answering (e.g. web server).
+                "echo $! > /dev/cpufreezer/cgroup.procs 2>/dev/null || " +
+                "echo $! > /sys/fs/cgroup/cgroup.procs 2>/dev/null";
         return Shell.cmd(command).exec().isSuccess();
     }
 
